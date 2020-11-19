@@ -1,0 +1,28 @@
+{
+  "name": "@epok.tech/fn-time",
+  "version": "0.0.1",
+  "description": "Simple time-stepping - frame, real-time, constant-step - via any API.",
+  "main": "index.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keeffEoghan/fn-time.git"
+  },
+  "author": "Eoghan O'Keeffe <epok.tech@gmail.com> (https://epok.tech)",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 12.14.1 || *",
+    "yarn": ">= 1.22.0 || *"
+  },
+  "bugs": {
+    "url": "https://github.com/keeffEoghan/fn-time/issues"
+  },
+  "homepage": "https://github.com/keeffEoghan/fn-time#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "time",
+    "utils"
+  ]
+}
