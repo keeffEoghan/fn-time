@@ -16,6 +16,20 @@ export const timeDef = 1000/60;
 /**
  * Sets up properties needed to track time, starts/steps time in various ways.
  *
+ * @example
+ *     // Initial call sets up properties.
+ *     const frame0 = { step: '-', time: Date.now() };
+ *
+ *     timer(frame0, frame0.time); // =>
+ *     { ...frame0, dt: 0 };
+ *
+ *     // Subsequent calls advance time and track difference.
+ *     const frame1 = { ...frame0 };
+ *     const next = Date.now();
+ *
+ *     timer(frame0, next, frame1); // =>
+ *     { ...frame1, dt: next-frame0.time, time: next };
+ *
  * @param {object} state The state being tracked.
  * @param {number} [state.time=startDef] The initial time.
  * @param {string|number} [state.step=stepDef] How time advances:
