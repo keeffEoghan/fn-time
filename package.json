@@ -1,8 +1,7 @@
 {
   "name": "@epok.tech/fn-time",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Simple time-stepping - frame, real-time, constant-step - via any API.",
-  "main": "index.js",
   "type": "module",
   "repository": {
     "type": "git",
@@ -11,16 +10,53 @@
   "author": "Eoghan O'Keeffe <epok.tech@gmail.com> (https://epok.tech)",
   "license": "MIT",
   "engines": {
-    "node": ">= 12.14.1 || *",
-    "yarn": ">= 1.22.0 || *"
+    "node": "v16.13.0 || *",
+    "yarn": "3.1.0 || *"
+  },
+  "packageManager": "yarn@3.1.0",
+  "scripts": {
+    "start": "yarn build",
+    "dev": "parcel --log-level verbose --target es",
+    "build": "rm -rf ./dist/ && parcel build --target es --target cjs",
+    "dev:safe": "yarn dev --no-cache",
+    "build:safe": "yarn build --no-cache"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.1"
+  },
+  "main": "dist/main/index.js",
+  "module": "dist/es/index.js",
+  "source": [
+    "index.js"
+  ],
+  "files": [
+    "*.js",
+    "dist/**/*"
+  ],
+  "targets": {
+    "cjs": {
+      "outputFormat": "commonjs",
+      "isLibrary": true,
+      "engines": {
+        "browsers": "last 2 versions, > 0.5%, not dead"
+      },
+      "distDir": "dist/main/",
+      "publicUrl": "dist/main/"
+    },
+    "es": {
+      "outputFormat": "esmodule",
+      "isLibrary": true,
+      "engines": {
+        "browsers": "last 2 versions, > 0.5%, not dead"
+      },
+      "distDir": "dist/es/",
+      "publicUrl": "dist/es/"
+    }
   },
   "bugs": {
     "url": "https://github.com/keeffEoghan/fn-time/issues"
   },
   "homepage": "https://github.com/keeffEoghan/fn-time#readme",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "time",
     "utils"
