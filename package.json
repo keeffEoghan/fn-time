@@ -1,6 +1,6 @@
 {
   "name": "@epok.tech/fn-time",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Simple time-stepping - frame, real-time, constant-step - via any API.",
   "type": "module",
   "repository": {

@@ -60,11 +60,11 @@ export const nowDef = { [steps.diff]: Date.now, [steps.add]: 1e3/60 };
  */
 export function timer(state, now, out = state) {
     // Get the initial time and step-step.
-    const { time: t0 = startDef, step = stepDef } = state;
+    const { time: t0 = startDef, step = stepDef, now: n } = state;
     // Get the step mode - from a key into `steps` or a numerical value.
     const s = (steps[step] ?? step);
     const diff = (s === steps.diff);
-    const t = (now ?? nowDef[s] ?? s);
+    const t = (now ?? n ?? nowDef[s] ?? s);
 
     // Step by `s`:
     // - `0` or falsey to `pause`
