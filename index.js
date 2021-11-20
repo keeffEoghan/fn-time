@@ -3,65 +3,82 @@
  */
 
 export const steps = {
-    diff: -1, pause: 0, add: 1,
-    '📏': -1, '⏸': 0, add: '⏭',
-    '-1': -1, '0': 0, '1': 1,
-    '-': -1, '0': 0, '+': 1
+    diff: '-', dt: '-', '⏳': '-',
+    pause: 0, '⏸': 0,
+    add: '+', '⏭': '+'
 };
 
-export const stepDef = steps.add;
+export const stepDef = steps.diff;
 export const startDef = 0;
-export const timeDef = 1000/60;
+export const nowDef = { [steps.diff]: Date.now, [steps.add]: 1e3/60 };
 
 /**
- * Sets up properties needed to track time, starts/steps time in various ways.
+ * Sets up properties needed to track time, starts/steps time in various ways:
+ * - Time-difference or time-advance stepping.
+ * - Step forwards or backwards in time or pause it.
+ * - Current time can be a number or function; or the object's fixed time-step.
+ * - Override property, pass the result to new objects.
  *
  * @example
  *     // Initial call sets up properties.
- *     const frame0 = { step: '-', time: Date.now() };
- *
- *     timer(frame0, frame0.time); // =>
- *     { ...frame0, dt: 0 };
+ *     const diff0 = timer({ step: '-' }, 200);
+ *     // => { step: '-', time: 200, dt: 200 };
+ *     const add0 = timer({ step: 200 });
+ *     // => { step: 200, time: 200, dt: 200 };
  *
  *     // Subsequent calls advance time and track difference.
- *     const frame1 = { ...frame0 };
- *     const next = Date.now();
  *
- *     timer(frame0, next, frame1); // =>
- *     { ...frame1, dt: next-frame0.time, time: next };
+ *     // No time difference here.
+ *     timer(diff0, 200); // => { step: '-', time: 200, dt: 0 };
+ *     timer(add0, 0); // => { step: 200, time: 200, dt: 0 };
+ *
+ *     // Time-difference here with a change or step, into a new result target.
+ *     const diff1 = timer(diff0, 300, {});
+ *     // => { step: '-', time: 300, dt: 100 };
+ *     const add1 = timer(add0, null, {});
+ *     // => { step: 200, time: 400, dt: 200 };
+ *
+ *     diff1.time-diff0.time === diff1.dt; // => true;
+ *     add1.time-add0.time === add1.dt; // => true;
  *
  * @param {object} state The state being tracked.
  * @param {number} [state.time=startDef] The initial time.
  * @param {string|number} [state.step=stepDef] How time advances:
- *     - Adding a time-step (`steps.add`/`'-'`, or a positive number).
- *     - Pausing (`steps.pause`/`'-'`, or `0`).
- *     - Diff from the latest time (`steps.diff`/`'-'`, or a negative number).
- * @param {number|function} [time=timeDef] The time (clock/frame/etc), or a
- *     function giving it; current time or time-step, according to `state.step`.
- * @param {object|false} [out=state] The state to set up; modifies `state` by
- *     default; or if falsey, returns the relevant calculated time value:
- *     - The latest time if add-stepping forwards, or paused.
- *     - The time-difference if diff-stepping from the latest time.
+ *     - Difference since last `time`: `'diff'`/`'dt'`/`'-'`/`'⏳'`.
+ *     - Pause: `'pause'`/`'⏸'`, or number zero (`0`).
+ *     - Add `time` step: `'add'`/`'+'`/`'⏭'`, or non-zero number (step size).
+ * @param {number|function} [now] The time now (clock/frame/step/etc), or a
+ *     function giving it; if not given, uses `state.step` if numeric or
+ *     `nowDef[state.step]` otherwise.
+ * @param {object|false} [out=state] The state to set up; modifies `state` if
+ *     not given.
  *
- * @returns {object|number} The given `out` set up with its initial time; or if
- *     `out` is falsey, returns the initial time.
+ * @returns {object|number} The given `out` set up with its initial `time`; or
+ *     if `out` is falsey, returns the relevant calculated unknown value:
+ *     - The difference since last `time` for `diff` step.
+ *     - The updated `time` for `add` or `pause` step.
  */
-export function timer(state, time = timeDef, out = state) {
+export function timer(state, now, out = state) {
     // Get the initial time and step-step.
     const { time: t0 = startDef, step = stepDef } = state;
     // Get the step mode - from a key into `steps` or a numerical value.
-    const d = ((step in steps)? steps[step] : step);
-    // Step the time - '0' pauses; '+' adds a time-step; '-' sets time, to diff.
-    const t1 = ((!d)? t0 : ((d > 0)? t0 : 0)+((isNaN(time))? time() : time));
+    const s = (steps[step] ?? step);
+    const diff = (s === steps.diff);
+    const t = (now ?? nowDef[s] ?? s);
+
+    // Step by `s`:
+    // - `0` or falsey to `pause`
+    // - `steps.diff` for difference since last `time`
+    // - `steps.add` or a number to add a `time` step
+    const t1 = ((!s)? t0 : ((diff)? 0 : t0)+((isNaN(t))? t() : t));
     const dt = t1-t0;
 
-    // If only returning a value, return the unknown one as calculated:
-    // - The latest time if add-stepping forwards, or paused.
-    // - The time-difference if diff-stepping from the latest time.
-    if(!out) { return ((d >= 0)? t1 : dt); }
+    // If only returning a value, return the relevant calculated unknown.
+    if(!out) { return ((diff)? dt : t1); }
 
     out.time = t1;
     out.dt = dt;
+    out.step = step;
 
     return out;
 }
